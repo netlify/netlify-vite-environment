@@ -1,0 +1,16 @@
+{
+  "name": "example-framework",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@netlify/vite-6-alpha-environment-provider-netlify": "workspace:*",
+    "vite": "^6.0.0-alpha.11"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}
