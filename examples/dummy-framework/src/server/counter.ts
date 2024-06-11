@@ -1,5 +1,7 @@
-export async function getCount(kv: KVNamespace) {
-  const count = parseInt((await kv.get("counter")) ?? "0");
-  await kv.put("counter", String(count + 1));
+import type { Store } from "@netlify/blobs";
+
+export async function getCount(blobs: Store) {
+  const count = parseInt((await blobs.get("counter")) ?? "0");
+  await blobs.set("counter", String(count + 1));
   return count;
 }

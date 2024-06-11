@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { DenoBridge as Deno } from "@netlify/edge-bundler";
+import type { BlobsServer } from "@netlify/blobs/server";
 import { DevEnvironment as ViteDevEnvironment } from "vite";
 
 import type { RunnerArguments } from "./shared/bridge";
@@ -16,14 +17,16 @@ export class RuntimeBridge extends EventEmitter {
   private server: Promise<void>;
   private runner: Promise<void>;
 
+  blobsPort: number;
   bootstrapped: boolean;
   devEnv: ViteDevEnvironment;
   hostPort: number;
   runnerPort: number;
 
-  constructor(devEnv: ViteDevEnvironment) {
+  constructor(devEnv: ViteDevEnvironment, blobsPort: number) {
     super();
 
+    this.blobsPort = blobsPort;
     this.bootstrapped = false;
     this.devEnv = devEnv;
   }
@@ -53,7 +56,7 @@ export class RuntimeBridge extends EventEmitter {
     if (req.url === "/register") {
       const portHeader = req.headers["x-runner-server-port"];
       const port = Number.parseInt(
-        typeof portHeader === "string" ? portHeader : undefined,
+        typeof portHeader === "string" ? portHeader : undefined
       );
 
       if (Number.isNaN(port)) {
@@ -87,9 +90,9 @@ export class RuntimeBridge extends EventEmitter {
       `http://0.0.0.0:${this.runnerPort}/__netlify-bootstrap`,
       {
         headers: {
-          "x-entrypoint-path": entrypointPath,
-        },
-      },
+          "x-entrypoint-path": entrypointPath
+        }
+      }
     );
 
     this.bootstrapped = entrypointRes.ok;
@@ -111,8 +114,8 @@ export class RuntimeBridge extends EventEmitter {
         body: req.body,
         headers: req.headers,
         method: req.method,
-        signal: req.signal,
-      }),
+        signal: req.signal
+      })
     );
   }
 
@@ -127,7 +130,7 @@ export class RuntimeBridge extends EventEmitter {
 
     this.server = new Promise((resolve, reject) => {
       const httpServer = http.createServer(async (req, res) =>
-        this.listener(req, res),
+        this.listener(req, res)
       );
 
       httpServer.on("error", (error) => {
@@ -139,7 +142,7 @@ export class RuntimeBridge extends EventEmitter {
 
         if (typeof address === "string") {
           return reject(
-            new Error("Server unexpectedly listening on a Unix pipe"),
+            new Error("Server unexpectedly listening on a Unix pipe")
           );
         }
 
@@ -175,14 +178,15 @@ export class RuntimeBridge extends EventEmitter {
 
     // The data sent to the runner as a Deno arg.
     const runnerArguments: RunnerArguments = {
+      blobsServerPort: this.blobsPort,
       hostServerPort: this.hostPort,
-      rootPath: this.devEnv.config.root,
+      rootPath: this.devEnv.config.root
     };
     const runnerPath = resolve(
       fileURLToPath(import.meta.url),
       "..",
       "deno",
-      "index.js",
+      "index.js"
     );
     const denoBridge = new Deno({});
 
@@ -190,8 +194,8 @@ export class RuntimeBridge extends EventEmitter {
       ["run", "--allow-all", runnerPath, JSON.stringify(runnerArguments)],
       undefined,
       {
-        pipeOutput: true,
-      },
+        pipeOutput: true
+      }
     );
 
     return this.runner;

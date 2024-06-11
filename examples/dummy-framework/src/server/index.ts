@@ -1,8 +1,10 @@
+import type { Store } from "@netlify/blobs";
+
 import { getUserAgentText } from "./userAgent";
 import { getCurrentTimeText } from "./time";
 import { getCount } from "./counter";
 
-export async function serverSideRender(env?: Env) {
+export async function serverSideRender(blobs?: Store) {
   const html = `
     <!doctype html>
       <html lang="en">
@@ -25,8 +27,8 @@ export async function serverSideRender(env?: Env) {
           <hr style="margin-top: 0" />
           <div style="display: flex; justify-content: space-between; padding: 0.25rem; margin-block: 0.15rem">
             <span>${getUserAgentText()}</span>${
-              env
-                ? `\n            <span>Count: ${await getCount(env.MY_KV)}</span>`
+              blobs
+                ? `\n            <span>Count: ${await getCount(blobs)}</span>`
                 : ""
             }
             <span>${getCurrentTimeText()}</span>

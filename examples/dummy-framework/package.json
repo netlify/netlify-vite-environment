@@ -11,6 +11,7 @@
     "vite": "^6.0.0-alpha.11"
   },
   "dependencies": {
+    "@netlify/blobs": "^7.3.0",
     "typescript": "^5.3.3"
   }
 }

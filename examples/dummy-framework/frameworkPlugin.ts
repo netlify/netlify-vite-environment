@@ -2,13 +2,13 @@ import type { ViteDevServer, Plugin } from "vite";
 import type * as http from "node:http";
 import {
   netlifyEnvironment,
-  type DevEnvironment,
+  type DevEnvironment
 } from "@netlify/vite-6-alpha-environment-provider-netlify";
 
 const ssrEnvName = "ssr-env";
 
 export function dummyFramework({
-  entrypoint,
+  entrypoint
 }: {
   entrypoint: string;
 }): Plugin[] {
@@ -28,7 +28,7 @@ export function dummyFramework({
 
         if (devEnv) {
           handler = await devEnv.api.getHandler({
-            entrypoint,
+            entrypoint
           });
         } else {
           throw new Error("No ssr environment was detected");
@@ -44,14 +44,14 @@ export function dummyFramework({
               const html = await resp.text();
               const transformedHtml = await server.transformIndexHtml(
                 url,
-                html,
+                html
               );
               res.end(transformedHtml);
-            },
+            }
           );
         };
-      },
-    },
+      }
+    }
   ];
 }
 

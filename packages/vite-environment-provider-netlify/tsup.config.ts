@@ -11,14 +11,14 @@ const buildPluginConfig = defineConfig({
     "lightningcss",
     "esbuild",
     "vite",
-    "@mapbox/node-pre-gyp",
+    "@mapbox/node-pre-gyp"
   ],
   banner: {
     js: `
     import {createRequire as ___createRequire} from "module";
     let require=___createRequire(import.meta.url);
-    `,
-  },
+    `
+  }
 });
 
 const buildDenoConfig = defineConfig({
@@ -26,7 +26,7 @@ const buildDenoConfig = defineConfig({
   outDir: "dist/deno",
   format: ["esm"],
   platform: "browser",
-  noExternal: [/.*/],
+  noExternal: [/.*/]
 });
 
 export default [buildPluginConfig, buildDenoConfig];

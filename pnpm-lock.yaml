@@ -14,6 +14,9 @@ importers:
 
   examples/dummy-framework:
     dependencies:
+      '@netlify/blobs':
+        specifier: ^7.3.0
+        version: 7.3.0
       typescript:
         specifier: ^5.3.3
         version: 5.4.5
@@ -27,6 +30,9 @@ importers:
 
   packages/vite-environment-provider-netlify:
     devDependencies:
+      '@netlify/blobs':
+        specifier: ^7.3.0
+        version: 7.3.0
       '@netlify/edge-bundler':
         specifier: ^12.0.1
         version: 12.0.1
@@ -574,6 +580,10 @@ packages:
       - encoding
       - supports-color
     dev: true
+
+  /@netlify/blobs@7.3.0:
+    resolution: {integrity: sha512-wN/kNTZo4xjlUM/C0WILOkJbe8p4AFquSGkZEIoIcgnsx5ikp2GyqGiq1WMLee7QdbnqeIV2g2hn/PjT324E5w==}
+    engines: {node: ^14.16.0 || >=16.0.0}
 
   /@netlify/edge-bundler@12.0.1:
     resolution: {integrity: sha512-7Soa0Ny2mDhPHfBbdg28FJ96Kk71Q6vDJfJ3d5BLBqSh6buw+TRcDJye84wJ9LaMlff+eAN/vlMgsoumCH5L9Q==}
