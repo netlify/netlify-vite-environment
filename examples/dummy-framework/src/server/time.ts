@@ -4,7 +4,7 @@ if (import.meta.hot) {
     // clear way to communicate with the browser and instruct
     // it to do a full page reload or whatever else that might
     // be appropriate for handling the server changes
-    console.log('__server/time has changed (SSR HMR is working!)__');
+    console.log("__server/time has changed (SSR HMR is working!)__");
   });
 }
 

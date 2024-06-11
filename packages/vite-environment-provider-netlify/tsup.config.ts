@@ -1,17 +1,17 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from "tsup";
 
 const buildPluginConfig = defineConfig({
-  entry: ['src/index.ts'],
-  outDir: 'dist',
+  entry: ["src/index.ts"],
+  outDir: "dist",
   dts: true,
-  format: ['esm'],
-  platform: 'node',
+  format: ["esm"],
+  platform: "node",
   external: [
-    '@cspotcode/source-map-support',
-    'lightningcss',
-    'esbuild',
-    'vite',
-    '@mapbox/node-pre-gyp',
+    "@cspotcode/source-map-support",
+    "lightningcss",
+    "esbuild",
+    "vite",
+    "@mapbox/node-pre-gyp",
   ],
   banner: {
     js: `
@@ -22,10 +22,10 @@ const buildPluginConfig = defineConfig({
 });
 
 const buildDenoConfig = defineConfig({
-  entry: ['src/deno/index.ts'],
-  outDir: 'dist/deno',
-  format: ['esm'],
-  platform: 'browser',
+  entry: ["src/deno/index.ts"],
+  outDir: "dist/deno",
+  format: ["esm"],
+  platform: "browser",
   noExternal: [/.*/],
 });
 

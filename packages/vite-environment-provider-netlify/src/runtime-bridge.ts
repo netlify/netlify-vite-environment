@@ -1,12 +1,12 @@
-import EventEmitter from 'node:events';
-import http from 'node:http';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import EventEmitter from "node:events";
+import http from "node:http";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { DenoBridge as Deno } from '@netlify/edge-bundler';
-import { DevEnvironment as ViteDevEnvironment } from 'vite';
+import { DenoBridge as Deno } from "@netlify/edge-bundler";
+import { DevEnvironment as ViteDevEnvironment } from "vite";
 
-import type { RunnerArguments } from './shared/bridge';
+import type { RunnerArguments } from "./shared/bridge";
 
 /**
  * A communication channel between the host (running Vite's DevEnvironment in
@@ -31,11 +31,11 @@ export class RuntimeBridge extends EventEmitter {
   private async listener(req: http.IncomingMessage, res: http.ServerResponse) {
     // The runner calls this endpoint when it wants to fetch the code for a
     // module.
-    if (req.url === '/fetch-module') {
-      if (typeof req.headers['x-id'] !== 'string') {
-        const error = new Error('Missing module ID');
+    if (req.url === "/fetch-module") {
+      if (typeof req.headers["x-id"] !== "string") {
+        const error = new Error("Missing module ID");
 
-        this.emit('runner_error', error);
+        this.emit("runner_error", error);
 
         res.writeHead(400);
         res.end(error.message);
@@ -43,23 +43,23 @@ export class RuntimeBridge extends EventEmitter {
         return;
       }
 
-      const mod = await this.devEnv.fetchModule(req.headers['x-id']);
+      const mod = await this.devEnv.fetchModule(req.headers["x-id"]);
 
       res.end(JSON.stringify(mod));
     }
 
     // The runner calls this endpoint when it starts its HTTP server. It
     // sends its port number in a header.
-    if (req.url === '/register') {
-      const portHeader = req.headers['x-runner-server-port'];
+    if (req.url === "/register") {
+      const portHeader = req.headers["x-runner-server-port"];
       const port = Number.parseInt(
-        typeof portHeader === 'string' ? portHeader : undefined,
+        typeof portHeader === "string" ? portHeader : undefined,
       );
 
       if (Number.isNaN(port)) {
-        const error = new Error('Missing or invalid port');
+        const error = new Error("Missing or invalid port");
 
-        this.emit('runner_error', error);
+        this.emit("runner_error", error);
 
         res.writeHead(400);
         res.end(error.message);
@@ -68,7 +68,7 @@ export class RuntimeBridge extends EventEmitter {
       }
 
       this.runnerPort = port;
-      this.emit('runner_ready', port);
+      this.emit("runner_ready", port);
     }
   }
 
@@ -87,7 +87,7 @@ export class RuntimeBridge extends EventEmitter {
       `http://0.0.0.0:${this.runnerPort}/__netlify-bootstrap`,
       {
         headers: {
-          'x-entrypoint-path': entrypointPath,
+          "x-entrypoint-path": entrypointPath,
         },
       },
     );
@@ -103,7 +103,7 @@ export class RuntimeBridge extends EventEmitter {
 
     const url = new URL(req.url);
 
-    url.hostname = '0.0.0.0';
+    url.hostname = "0.0.0.0";
     url.port = this.runnerPort.toString();
 
     return await fetch(
@@ -121,33 +121,35 @@ export class RuntimeBridge extends EventEmitter {
    * resolves once the HTTP server is up.
    */
   startHost() {
-    if (!this.server) {
-      this.server = new Promise((resolve, reject) => {
-        const httpServer = http.createServer(async (req, res) =>
-          this.listener(req, res),
-        );
-
-        httpServer.on('error', error => {
-          reject(error);
-        });
-
-        httpServer.listen({ port: 0 }, () => {
-          const address = httpServer.address();
-
-          if (typeof address === 'string') {
-            return reject(
-              new Error('Server unexpectedly listening on a Unix pipe'),
-            );
-          }
-
-          this.emit('host_ready', address.port);
-
-          this.hostPort = address.port;
-
-          resolve();
-        });
-      });
+    if (this.server) {
+      return this.server;
     }
+
+    this.server = new Promise((resolve, reject) => {
+      const httpServer = http.createServer(async (req, res) =>
+        this.listener(req, res),
+      );
+
+      httpServer.on("error", (error) => {
+        reject(error);
+      });
+
+      httpServer.listen({ port: 0 }, () => {
+        const address = httpServer.address();
+
+        if (typeof address === "string") {
+          return reject(
+            new Error("Server unexpectedly listening on a Unix pipe"),
+          );
+        }
+
+        this.emit("host_ready", address.port);
+
+        this.hostPort = address.port;
+
+        resolve();
+      });
+    });
 
     return this.server;
   }
@@ -157,38 +159,40 @@ export class RuntimeBridge extends EventEmitter {
    * start its own HTTP server and ping back with its port.
    */
   startRunner() {
-    if (!this.runner) {
-      this.runner = new Promise((resolve, reject) => {
-        this.on('runner_error', (error: Error) => {
-          reject(error);
-        });
+    if (this.runner) {
+      return this.runner;
+    }
 
-        this.on('runner_ready', () => {
-          resolve();
-        });
+    this.runner = new Promise((resolve, reject) => {
+      this.on("runner_error", (error: Error) => {
+        reject(error);
       });
 
-      // The data sent to the Deno script.
-      const runnerArguments: RunnerArguments = {
-        hostServerPort: this.hostPort,
-        rootPath: this.devEnv.config.root,
-      };
-      const runnerPath = resolve(
-        fileURLToPath(import.meta.url),
-        '..',
-        'deno',
-        'index.js',
-      );
-      const denoBridge = new Deno({});
+      this.on("runner_ready", () => {
+        resolve();
+      });
+    });
 
-      denoBridge.runInBackground(
-        ['run', '--allow-all', runnerPath, JSON.stringify(runnerArguments)],
-        undefined,
-        {
-          pipeOutput: true,
-        },
-      );
-    }
+    // The data sent to the runner as a Deno arg.
+    const runnerArguments: RunnerArguments = {
+      hostServerPort: this.hostPort,
+      rootPath: this.devEnv.config.root,
+    };
+    const runnerPath = resolve(
+      fileURLToPath(import.meta.url),
+      "..",
+      "deno",
+      "index.js",
+    );
+    const denoBridge = new Deno({});
+
+    denoBridge.runInBackground(
+      ["run", "--allow-all", runnerPath, JSON.stringify(runnerArguments)],
+      undefined,
+      {
+        pipeOutput: true,
+      },
+    );
 
     return this.runner;
   }

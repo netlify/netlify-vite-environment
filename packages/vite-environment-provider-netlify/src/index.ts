@@ -3,26 +3,24 @@ import {
   BuildEnvironment,
   type ResolvedConfig,
   type Plugin,
-} from 'vite';
+} from "vite";
 
-import { RuntimeBridge } from './runtime-bridge';
+import { RuntimeBridge } from "./runtime-bridge";
 
 export type NetlifyEnvironmentProviderOptions = {};
 
 export function netlifyEnvironment(
   environmentName: string,
-  _options: NetlifyEnvironmentProviderOptions = {},
+  options: NetlifyEnvironmentProviderOptions = {},
 ): Plugin[] {
   return [
     {
-      name: 'node:vm-environment-plugin',
+      name: "netlify-environment-plugin",
 
       async config() {
-        // we could use the provided options here...
-
         return {
           environments: {
-            [environmentName]: createNetlifyEnvironment(),
+            [environmentName]: createNetlifyEnvironment(options),
           },
         };
       },
@@ -30,15 +28,17 @@ export function netlifyEnvironment(
   ];
 }
 
-export function createNetlifyEnvironment() {
+export function createNetlifyEnvironment(
+  options: NetlifyEnvironmentProviderOptions,
+) {
   return {
-    metadata: { runtimeName: 'netlify' },
+    metadata: { runtimeName: "netlify" },
     dev: {
       createEnvironment(
         name: string,
         config: ResolvedConfig,
       ): Promise<DevEnvironment> {
-        return createNetlifyDevEnvironment(name, config);
+        return createNetlifyDevEnvironment(name, config, options);
       },
     },
     build: {
@@ -46,7 +46,7 @@ export function createNetlifyEnvironment() {
         name: string,
         config: ResolvedConfig,
       ): Promise<BuildEnvironment> {
-        return createNetlifyBuildEnvironment(name, config);
+        return createNetlifyBuildEnvironment(name, config, options);
       },
     },
   };
@@ -55,6 +55,7 @@ export function createNetlifyEnvironment() {
 async function createNetlifyBuildEnvironment(
   name: string,
   config: ResolvedConfig,
+  _options: NetlifyEnvironmentProviderOptions,
 ): Promise<BuildEnvironment> {
   return new BuildEnvironment(name, config);
 }
@@ -62,6 +63,7 @@ async function createNetlifyBuildEnvironment(
 async function createNetlifyDevEnvironment(
   name: string,
   config: any,
+  _options: NetlifyEnvironmentProviderOptions,
 ): Promise<DevEnvironment> {
   const devEnv = new ViteDevEnvironment(name, config, {
     hot: false,

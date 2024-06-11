@@ -1,5 +1,5 @@
-export function render(inputValue: string = '') {
-  const inputWrapper = document.getElementById('input-a-wrapper');
+export function render(inputValue: string = "") {
+  const inputWrapper = document.getElementById("input-a-wrapper");
 
   if (inputWrapper) {
     inputWrapper.innerHTML = `
@@ -10,8 +10,8 @@ export function render(inputValue: string = '') {
 }
 
 if (import.meta.hot) {
-  import.meta.hot.accept(updatedModule => {
-    const input = document.getElementById('input-a');
+  import.meta.hot.accept((updatedModule) => {
+    const input = document.getElementById("input-a");
 
     if (input) {
       const inputValue = (input as HTMLInputElement).value;

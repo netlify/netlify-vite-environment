@@ -1,10 +1,10 @@
-import type { UserConfig } from 'vite';
-import { dummyFramework } from './frameworkPlugin';
+import type { UserConfig } from "vite";
+import { dummyFramework } from "./frameworkPlugin";
 
 const config: UserConfig = {
-  appType: 'custom',
+  appType: "custom",
   ssr: {
-    target: 'webworker',
+    target: "webworker",
   },
   dev: {
     preTransformRequests: false,
@@ -17,7 +17,7 @@ const config: UserConfig = {
   },
   plugins: [
     dummyFramework({
-      entrypoint: './entry-edge-function.ts',
+      entrypoint: "./entry-edge-function.ts",
     }),
   ],
 };

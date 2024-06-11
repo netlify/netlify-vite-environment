@@ -1,11 +1,11 @@
-import type { ViteDevServer, Plugin } from 'vite';
-import type * as http from 'node:http';
+import type { ViteDevServer, Plugin } from "vite";
+import type * as http from "node:http";
 import {
   netlifyEnvironment,
   type DevEnvironment,
-} from '@netlify/vite-6-alpha-environment-provider-netlify';
+} from "@netlify/vite-6-alpha-environment-provider-netlify";
 
-const ssrEnvName = 'ssr-env';
+const ssrEnvName = "ssr-env";
 
 export function dummyFramework({
   entrypoint,
@@ -17,7 +17,7 @@ export function dummyFramework({
   return [
     ...environmentPlugin,
     {
-      name: 'example-framework-plugin',
+      name: "example-framework-plugin",
 
       async configureServer(server: ViteDevServer) {
         const devEnv = server.environments[ssrEnvName] as
@@ -31,13 +31,13 @@ export function dummyFramework({
             entrypoint,
           });
         } else {
-          throw new Error('No ssr environment was detected');
+          throw new Error("No ssr environment was detected");
         }
 
         return async () => {
           server.middlewares.use(
             async (req: http.IncomingMessage, res: http.ServerResponse) => {
-              const url = `http://localhost${req.url ?? '/'}`;
+              const url = `http://localhost${req.url ?? "/"}`;
 
               const nativeReq = new Request(url);
               const resp = await handler(nativeReq);

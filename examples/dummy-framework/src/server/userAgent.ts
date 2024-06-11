@@ -4,13 +4,13 @@ if (import.meta.hot) {
     // clear way to communicate with the browser and instruct
     // it to do a full page reload or whatever else that might
     // be appropriate for handling the server changes
-    console.log('__server/userAgent has changed (SSR HMR is working!)__');
+    console.log("__server/userAgent has changed (SSR HMR is working!)__");
   });
 }
 
 export function getUserAgentText(): string {
-  if (typeof navigator === 'undefined') {
-    return 'navigator is undefined (running in Node.js?)';
+  if (typeof navigator === "undefined") {
+    return "navigator is undefined (running in Node.js?)";
   } else {
     const userAgent = navigator.userAgent;
     return `navigator.userAgent = ${userAgent}`;
